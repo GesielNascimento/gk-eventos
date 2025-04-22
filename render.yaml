@@ -4,11 +4,11 @@ services:
     env: docker
     plan: free
     buildCommand: |
-      composer install
+      composer install --no-interaction --prefer-dist --optimize-autoloader
+      php artisan config:clear
       php artisan config:cache
       php artisan key:generate
       php artisan migrate --force
-    dockerfilePath: Dockerfile
     envVars:
       - key: APP_ENV
         value: production
