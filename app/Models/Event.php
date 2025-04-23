@@ -10,18 +10,18 @@ class Event extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',         // 👈🏽 campo adicionado
+        'user_id',
         'title',
         'description',
         'event_date',
         'event_time',
         'location',
         'banner_path',
+        'category_id', // 👈🏽 novo campo para associação com a categoria
     ];
 
     /**
      * Um evento pertence a um usuário.
-     * Isso indica que o evento foi criado por um usuário específico.
      */
     public function user()
     {
@@ -36,21 +36,20 @@ class Event extends Model
         return $this->belongsToMany(User::class)->withTimestamps();
     }
 
-     /**
-     * Relacionamento: Um evento pode ter várias inscrições.
+    /**
+     * Um evento pode ter várias inscrições.
      */
     public function registrations()
     {
         return $this->hasMany(\App\Models\Registration::class);
     }
 
-
     /**
-     * Um evento pode ter várias inscrições (participants).
-     * Isso será usado futuramente para gerenciar quem está inscrito em qual evento.
+     * Um evento pertence a uma categoria.
+     * Relacionamento para identificar a qual categoria o evento pertence.
      */
-    //public function participants()
-    //{
-      //  return $this->hasMany(Participant::class);
-    //}
+    public function category()
+    {
+        return $this->belongsTo(\App\Models\Category::class);
+    }
 }

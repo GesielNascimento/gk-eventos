@@ -1,41 +1,65 @@
 <!DOCTYPE html>
-<html lang="pt-BR" x-data x-init>
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'GK Events')</title>
-    @vite('resources/css/app.css')
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="bg-white text-gray-800">
 
     <!-- NAVBAR -->
     <header class="bg-blue-900 text-white shadow-md">
-        <div class="max-w-7xl mx-auto px-9 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="max-w-7xl mx-auto px-9 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="text-2xl font-extrabold">GKA <span class="text-blue-300">events</span></div>
 
-            <nav class="flex flex-wrap gap-12 text-sm font-medium justify-center">
+            <nav class="flex flex-wrap gap-6 text-sm font-medium justify-center items-center relative">
                 <a href="{{ route('home') }}" class="hover:text-blue-300">Início</a>
                 <a href="{{ route('institucional.quem-somos') }}" class="hover:text-blue-300">Quem Somos</a>
                 <a href="{{ route('institucional.nossa-missao') }}" class="hover:text-blue-300">Nossa Missão</a>
                 <a href="{{ route('institucional.contato') }}" class="hover:text-blue-300">Contato</a>
+
+                <!-- Dropdown de Categorias (hover) -->
+<div class="relative group">
+    <button class="flex items-center gap-1 text-white hover:text-blue-300">
+        Eventos
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </button>
+
+    <div class="absolute left-0 mt-2 w-48 bg-white text-gray-800 rounded shadow-lg z-50
+                opacity-0 group-hover:opacity-100 invisible group-hover:visible
+                transition-all duration-300 ease-in-out">
+        @foreach ($categories as $category)
+            @if ($category->slug)
+                <a href="{{ route('categories.showBySlug', ['slug' => $category->slug]) }}"
+                   class="block px-4 py-2 text-sm hover:bg-blue-100 transition">
+                    {{ $category->name }}
+                </a>
+            @endif
+        @endforeach
+    </div>
+</div>
+
             </nav>
 
-
-            <div class="flex gap-6">
+            <!-- Botões de Autenticação -->
+            <div class="flex gap-3 mt-2 md:mt-0">
                 <a href="{{ route('login') }}"
-                class="bg-gray-100 text-blue-900 px-5 py-2 rounded-lg text-sm font-semibold flex items-center gap-1 hover:bg-gray-200 transition">
+                   class="bg-gray-100 text-blue-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-200 transition">
                     🔒 Entrar
                 </a>
                 <a href="{{ route('register') }}"
-                class="bg-blue-100 text-blue-900 px-5 py-2 rounded-lg text-sm font-semibold flex items-center gap-1 hover:bg-blue-200 transition">
+                   class="bg-blue-100 text-blue-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-200 transition">
                     📋 Cadastrar
                 </a>
             </div>
         </div>
     </header>
 
-    <!-- CARROSSEL (OPCIONAL) -->
+    <!-- CARROSSEL -->
     @hasSection('carousel')
         @yield('carousel')
     @endif

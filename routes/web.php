@@ -5,8 +5,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\PublicEventController;
+use App\Http\Controllers\CategoryController; // ✅ Importado para rotas de categoria
 
-// ✅ NOVO: Página inicial leva aos eventos públicos
+// ✅ Página inicial leva aos eventos públicos
 Route::get('/', [PublicEventController::class, 'index'])->name('home');
 
 // 🔐 Rotas protegidas (requer login)
@@ -44,16 +45,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::get('/public-events', [PublicEventController::class, 'index'])->name('public.events');
 Route::get('/public-events/{id}', [PublicEventController::class, 'show'])->name('public.events.show');
 
-// 📌 Rota aberta de listagem e detalhes de eventos (útil para rotas REST ou APIs internas)
+// 📌 Listagem e detalhes de eventos
 Route::get('/events', [EventController::class, 'index'])->name('events.index');
 Route::get('/events/{id}', [EventController::class, 'show'])->name('events.show');
 Route::post('/events/{id}/register', [EventController::class, 'register'])->middleware(['auth'])->name('events.register');
-
 
 // 🏛️ Páginas Institucionais
 Route::view('/quem-somos', 'institucional.quem-somos')->name('institucional.quem-somos');
 Route::view('/nossa-missao', 'institucional.nossa-missao')->name('institucional.nossa-missao');
 Route::view('/contato', 'institucional.contato')->name('institucional.contato');
 
-// Auth rotas (login, registro, etc.)
+// ✅ Rota correta com nome esperado na navbar
+Route::get('/categorias/{slug}', [CategoryController::class, 'showBySlug'])->name('categories.showBySlug');
+
+// 🔐 Rotas de autenticação
 require __DIR__ . '/auth.php';

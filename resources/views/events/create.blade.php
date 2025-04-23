@@ -65,6 +65,20 @@
                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring focus:ring-blue-200 focus:outline-none">
             </div>
 
+            <!-- Categoria -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">📚 Categoria</label>
+                <select name="category_id"
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2 bg-white focus:ring focus:ring-blue-200 focus:outline-none">
+                    <option value="">Selecione uma categoria</option>
+                    @foreach ($categories as $category)
+                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                            {{ $category->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
             <!-- Banner -->
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">🖼️ Banner do Evento</label>

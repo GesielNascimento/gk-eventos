@@ -2,22 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Category;
 use App\Models\Event;
 use App\Models\Registration;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class EventController extends Controller
 {
-    // Exibe o formulário de cadastro de evento
     public function create()
     {
-        return view('events.create');
+        $categories = Category::all(); // 👈🏽 Carrega as categorias
+        return view('events.create', compact('categories'));
     }
 
-    // Salva um novo evento no banco de dados
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -26,26 +26,24 @@ class EventController extends Controller
             'event_date' => 'required|date',
             'event_time' => 'required',
             'location' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id', // ✅ validação da categoria
             'banner' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $path = $request->file('banner')->store('banners', 'public');
-        $validated['banner_path'] = $path;
         $validated['user_id'] = Auth::id();
+        $validated['banner_path'] = $request->file('banner')->store('banners', 'public');
 
         Event::create($validated);
 
         return redirect()->route('events.create')->with('success', 'Evento cadastrado com sucesso!');
     }
 
-    // Lista todos os eventos disponíveis
     public function index()
     {
         $events = Event::latest()->get();
         return view('events.index', compact('events'));
     }
 
-    // Exibe os detalhes de um evento específico
     public function show($id)
     {
         $event = Event::findOrFail($id);
@@ -56,7 +54,6 @@ class EventController extends Controller
         ]);
     }
 
-    // Exibe o formulário de edição de evento
     public function edit($id)
     {
         $event = Event::findOrFail($id);
@@ -65,10 +62,10 @@ class EventController extends Controller
             abort(403, 'Você não tem permissão para editar este evento.');
         }
 
-        return view('events.edit', compact('event'));
+        $categories = Category::all(); // 👈🏽 também carrega as categorias para edição
+        return view('events.edit', compact('event', 'categories'));
     }
 
-    // Atualiza os dados do evento
     public function update(Request $request, $id)
     {
         $event = Event::findOrFail($id);
@@ -83,12 +80,12 @@ class EventController extends Controller
             'event_date' => 'required|date',
             'event_time' => 'required',
             'location' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
             'banner' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         if ($request->hasFile('banner')) {
-            $path = $request->file('banner')->store('banners', 'public');
-            $validated['banner_path'] = $path;
+            $validated['banner_path'] = $request->file('banner')->store('banners', 'public');
         }
 
         $event->update($validated);
@@ -96,7 +93,6 @@ class EventController extends Controller
         return redirect()->route('events.index')->with('success', 'Evento atualizado com sucesso!');
     }
 
-    // ✅ Remove um evento (apenas o criador pode excluir)
     public function destroy($id)
     {
         $event = Event::findOrFail($id);
@@ -187,29 +183,28 @@ class EventController extends Controller
     }
 
     public function generateCertificate($id)
-{
-    $event = Event::findOrFail($id);
-    $user = Auth::user();
+    {
+        $event = Event::findOrFail($id);
+        $user = Auth::user();
 
-    $registration = Registration::where('event_id', $event->id)
-                                 ->where('user_id', $user->id)
-                                 ->where('present', true)
-                                 ->first();
+        $registration = Registration::where('event_id', $event->id)
+                                     ->where('user_id', $user->id)
+                                     ->where('present', true)
+                                     ->first();
 
-    if (!$registration) {
-        return redirect()->route('dashboard')->with('warning', 'Você não participou ou ainda não teve sua presença confirmada neste evento.');
+        if (!$registration) {
+            return redirect()->route('dashboard')->with('warning', 'Você não participou ou ainda não teve sua presença confirmada neste evento.');
+        }
+
+        $pdf = Pdf::loadView('events.certificate', [
+            'participant_name' => strtoupper($user->name),
+            'event_title' => $event->title,
+            'event_date' => $event->event_date,
+            'event_hours' => 8,
+            'responsible_name' => 'Fulano de Tal',
+            'auth_code' => strtoupper(uniqid('GK-')),
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->stream('certificado-' . $event->id . '-' . $user->id . '.pdf');
     }
-
-    $pdf = Pdf::loadView('events.certificate', [
-        'participant_name' => strtoupper($user->name),
-        'event_title' => $event->title,
-        'event_date' => $event->event_date,
-        'event_hours' => 8, // 🔄 Troque se quiser puxar da base de dados
-        'responsible_name' => 'Fulano de Tal',
-        'auth_code' => strtoupper(uniqid('GK-')),
-    ])->setPaper('a4', 'landscape');
-
-    return $pdf->stream('certificado-' . $event->id . '-' . $user->id . '.pdf');
-}
-
 }
