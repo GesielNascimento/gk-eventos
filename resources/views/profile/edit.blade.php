@@ -14,9 +14,28 @@
         @endif
 
         {{-- Formulário de atualização de dados --}}
-        <form method="POST" action="{{ route('profile.update') }}" class="bg-white p-6 rounded-xl shadow space-y-6">
+        <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="bg-white p-6 rounded-xl shadow space-y-6">
             @csrf
             @method('PATCH')
+
+            <!-- Foto de Perfil -->
+            <div>
+                <label for="profile_photo" class="block font-semibold mb-1">Foto de Perfil</label>
+
+                @if ($user->profile_photo_path)
+                    <div class="mb-3">
+                        <img src="{{ asset('storage/' . $user->profile_photo_path) }}" alt="Foto de Perfil"
+                             class="w-24 h-24 object-cover rounded-full border border-gray-300">
+                    </div>
+                @endif
+
+                <input type="file" name="profile_photo" id="profile_photo"
+                       class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
+                              file:rounded-full file:border-0
+                              file:text-sm file:font-semibold
+                              file:bg-blue-50 file:text-blue-700
+                              hover:file:bg-blue-100" />
+            </div>
 
             <!-- Nome -->
             <div>
