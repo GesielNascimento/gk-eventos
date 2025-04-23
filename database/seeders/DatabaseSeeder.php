@@ -2,22 +2,51 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\User;
+use App\Models\Category;
+use App\Models\Event;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // ✅ Cria um usuário administrador
+        $user = User::create([
+            'name' => 'Admin',
+            'email' => 'admin@gkeventos.com',
+            'password' => Hash::make('senha123'),
+        ]);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // ✅ Cria categorias padrão
+        $categories = [
+            'Educação' => 'educacao',
+            'Saúde' => 'saude',
+            'Tecnologia' => 'tecnologia',
+            'Religião' => 'religiao',
+            'Meio Ambiente' => 'meio-ambiente',
+            'Outros' => 'outros',
+        ];
+
+        foreach ($categories as $name => $slug) {
+            Category::create([
+                'name' => $name,
+                'slug' => $slug,
+            ]);
+        }
+
+        // ✅ Cria um evento de teste público
+        Event::create([
+            'user_id'     => $user->id,
+            'title'       => 'Evento Teste Público',
+            'description' => 'Evento criado automaticamente no ambiente PostgreSQL.',
+            'event_date'  => now()->addDays(5),
+            'event_time'  => '19:00',
+            'location'    => 'Praça da Bíblia',
+            'banner_path' => 'banners/default.jpg',
+            'category_id' => 3, // Tecnologia
+            'is_public'   => true,
         ]);
     }
 }
