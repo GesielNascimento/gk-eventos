@@ -37,17 +37,31 @@
                 ⬅️ Voltar
             </a>
 
-            @auth
-                @if (!auth()->user()->registrations->contains('event_id', $event->id))
-                    <form method="POST" action="{{ route('events.register', $event->id) }}">
-                        @csrf
-                        <button type="submit"
-                            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-                            ✅ Inscrever-se
-                        </button>
-                    </form>
-                @endif
-            @endauth
+            {{-- INSCRIÇÃO SOMENTE SE NÃO ENCERRADO --}}
+            @if (!$event->is_finished)
+                @auth
+                    @if (!auth()->user()->registrations->contains('event_id', $event->id))
+                        <form method="POST" action="{{ route('events.register', $event->id) }}">
+                            @csrf
+                            <button type="submit"
+                                class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                                ✅ Inscrever-se
+                            </button>
+                        </form>
+                    @else
+                        <span class="text-green-700 font-medium">Você já está inscrito neste evento.</span>
+                    @endif
+                @else
+                    <a href="{{ route('login') }}"
+                       class="inline-flex items-center px-4 py-2 bg-yellow-300 text-yellow-900 rounded hover:bg-yellow-400 transition">
+                        🔐 Faça login para se inscrever
+                    </a>
+                @endauth
+            @else
+                <span class="inline-block bg-red-100 text-red-800 px-4 py-2 rounded font-semibold">
+                    Evento Encerrado
+                </span>
+            @endif
         </div>
     </section>
 @endsection

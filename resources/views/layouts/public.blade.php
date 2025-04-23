@@ -20,41 +20,67 @@
                 <a href="{{ route('institucional.nossa-missao') }}" class="hover:text-blue-300">Nossa Missão</a>
                 <a href="{{ route('institucional.contato') }}" class="hover:text-blue-300">Contato</a>
 
-                <!-- Dropdown de Categorias (hover) -->
-<div class="relative group">
-    <button class="flex items-center gap-1 text-white hover:text-blue-300">
-        Eventos
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-        </svg>
-    </button>
+                <!-- Dropdown de Categorias -->
+                <div class="relative group">
+                    <button class="flex items-center gap-1 text-white hover:text-blue-300">
+                        Eventos
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
 
-    <div class="absolute left-0 mt-2 w-48 bg-white text-gray-800 rounded shadow-lg z-50
-                opacity-0 group-hover:opacity-100 invisible group-hover:visible
-                transition-all duration-300 ease-in-out">
-        @foreach ($categories as $category)
-            @if ($category->slug)
-                <a href="{{ route('categories.showBySlug', ['slug' => $category->slug]) }}"
-                   class="block px-4 py-2 text-sm hover:bg-blue-100 transition">
-                    {{ $category->name }}
-                </a>
-            @endif
-        @endforeach
-    </div>
-</div>
-
+                    <div class="absolute left-0 mt-2 w-48 bg-white text-gray-800 rounded shadow-lg z-50
+                                opacity-0 group-hover:opacity-100 invisible group-hover:visible
+                                transition-all duration-200 ease-in-out">
+                        @foreach ($categories as $category)
+                            @if ($category->slug)
+                                <a href="{{ route('categories.showBySlug', ['slug' => $category->slug]) }}"
+                                   class="block px-4 py-2 text-sm hover:bg-blue-100 transition">
+                                    {{ $category->name }}
+                                </a>
+                            @endif
+                        @endforeach
+                    </div>
+                </div>
             </nav>
 
-            <!-- Botões de Autenticação -->
-            <div class="flex gap-3 mt-2 md:mt-0">
-                <a href="{{ route('login') }}"
-                   class="bg-gray-100 text-blue-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-200 transition">
-                    🔒 Entrar
-                </a>
-                <a href="{{ route('register') }}"
-                   class="bg-blue-100 text-blue-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-200 transition">
-                    📋 Cadastrar
-                </a>
+            <!-- Autenticação -->
+            <div class="flex items-center gap-3 mt-2 md:mt-0">
+                @auth
+                    <!-- Menu de usuário com círculo e seta -->
+                    <div class="relative group">
+                        <button class="flex items-center justify-center gap-1 bg-blue-100 text-blue-900 w-10 h-10 rounded-full font-bold focus:outline-none group-hover:bg-blue-200 transition relative">
+                            <span class="text-sm leading-none">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 class="w-4 h-4 absolute -right-1 -bottom-1 bg-white text-blue-800 rounded-full p-0.5 shadow"
+                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded shadow-lg z-50
+                                    opacity-0 group-hover:opacity-100 invisible group-hover:visible
+                                    transition-all duration-200 ease-in-out">
+                            <div class="px-4 py-2 text-sm text-gray-500 border-b border-gray-200">
+                                {{ auth()->user()->email }}
+                            </div>
+                            <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-sm hover:bg-blue-50">📊 Painel</a>
+                            <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm hover:bg-blue-50">🙋 Meu Perfil</a>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="block w-full text-left px-4 py-2 text-sm hover:bg-blue-50">🔒 Sair</button>
+                            </form>
+                        </div>
+                    </div>
+                @else
+                    <a href="{{ route('login') }}"
+                       class="bg-gray-100 text-blue-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-200 transition">
+                        🔒 Entrar
+                    </a>
+                    <a href="{{ route('register') }}"
+                       class="bg-blue-100 text-blue-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-200 transition">
+                        📋 Cadastrar
+                    </a>
+                @endauth
             </div>
         </div>
     </header>
@@ -91,17 +117,17 @@
                 <div class="flex gap-4 mt-2">
                     <a href="#" aria-label="Instagram" class="hover:text-blue-300">
                         <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                            <path d="M7.75 2A5.75 5.75 0 002 7.75v8.5A5.75 5.75 0 007.75 22h8.5A5.75 5.75 0 0022 16.25v-8.5A5.75 5.75 0 0016.25 2h-8.5zM4.5 7.75a3.25 3.25 0 013.25-3.25h8.5a3.25 3.25 0 013.25 3.25v8.5a3.25 3.25 0 01-3.25 3.25h-8.5A3.25 3.25 0 014.5 16.25v-8.5zM12 8a4 4 0 100 8 4 4 0 000-8zm0 1.5a2.5 2.5 0 110 5 2.5 2.5 0 010-5zm5.5-.88a1 1 0 11-2 0 1 1 0 012 0z"/>
+                            <path d="..."/>
                         </svg>
                     </a>
                     <a href="#" aria-label="Facebook" class="hover:text-blue-300">
                         <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                            <path d="M22 12a10 10 0 10-11.63 9.87v-6.99h-2.77v-2.88h2.77V9.4c0-2.74 1.63-4.25 4.12-4.25 1.2 0 2.45.21 2.45.21v2.69h-1.38c-1.36 0-1.79.84-1.79 1.7v2.04h3.05l-.49 2.88h-2.56V22A10 10 0 0022 12z"/>
+                            <path d="..."/>
                         </svg>
                     </a>
                     <a href="#" aria-label="YouTube" class="hover:text-blue-300">
                         <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                            <path d="M21.8 8.001s-.2-1.5-.8-2.2c-.7-.8-1.5-.8-1.9-.9C16.5 4.7 12 4.7 12 4.7h-.1s-4.5 0-7.1.2c-.5.1-1.2.1-1.9.9C2.2 6.5 2 8 2 8S1.8 9.7 1.8 11.5v1c0 1.8.2 3.5.2 3.5s.2 1.5.8 2.2c.7.8 1.7.8 2.2.9 1.6.2 6.8.2 6.8.2s4.5 0 7.1-.2c.5-.1 1.2-.1 1.9-.9.6-.7.8-2.2.8-2.2s.2-1.8.2-3.5v-1c0-1.8-.2-3.5-.2-3.5zM9.75 14.8V9.2l5.3 2.8-5.3 2.8z"/>
+                            <path d="..."/>
                         </svg>
                     </a>
                 </div>

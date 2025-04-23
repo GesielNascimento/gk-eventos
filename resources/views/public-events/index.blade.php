@@ -50,12 +50,37 @@
         <h3 class="text-center text-white text-xl font-bold tracking-wide">🌅 Inscrições Abertas</h3>
     </section>
 
+    <!-- CAMPO DE BUSCA -->
+    <form method="GET" action="{{ route('public.events') }}" class="mb-6 max-w-xl mx-auto">
+        <div class="flex items-center gap-2">
+            <input
+                type="text"
+                name="search"
+                placeholder="Buscar evento por título..."
+                value="{{ request('search') }}"
+                class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring focus:ring-blue-200 focus:outline-none"
+            >
+            <button
+                type="submit"
+                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+            >
+                🔍 Buscar
+            </button>
+        </div>
+    </form>
+
     <!-- LISTA DE EVENTOS -->
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         @forelse ($events as $event)
             <div class="bg-white dark:bg-gray-800 shadow rounded-xl overflow-hidden flex flex-col md:flex-row gap-4 p-4 items-center">
-                <div class="w-full md:w-1/3">
+                <div class="w-full md:w-1/3 relative">
                     <img src="{{ asset('storage/' . $event->banner_path) }}" alt="Banner" class="w-full aspect-[16/9] object-cover rounded-lg">
+
+                    @if ($event->is_finished)
+                        <span class="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-1 rounded shadow">
+                            Encerrado
+                        </span>
+                    @endif
                 </div>
 
                 <div class="w-full md:w-2/3 flex flex-col justify-between gap-2">
@@ -64,10 +89,12 @@
                     <p class="text-gray-500 dark:text-gray-300 text-sm">📍 {{ $event->location }}</p>
                     <p class="text-gray-600 dark:text-gray-400 text-sm">{{ Str::limit($event->description, 100) }}</p>
 
-                    <a href="{{ route('public.events.show', $event->id) }}"
-                       class="px-4 py-2 mt-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition w-fit">
-                        🔍 Ver Detalhes
-                    </a>
+                    @if (!$event->is_finished)
+                        <a href="{{ route('public.events.show', $event->id) }}"
+                           class="px-4 py-2 mt-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition w-fit">
+                            🔍 Ver Detalhes
+                        </a>
+                    @endif
                 </div>
             </div>
         @empty

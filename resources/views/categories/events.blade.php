@@ -27,7 +27,7 @@
                     <p class="text-sm text-gray-600">📍 {{ $event->location }}</p>
                     <p class="text-sm text-gray-700">{{ \Illuminate\Support\Str::limit($event->description, 100) }}</p>
 
-                    <a href="{{ route('events.show', $event->id) }}"
+                    <a href="{{ route('public.events.show', $event->id) }}"
                        class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition text-sm mt-2">
                         🔍 Ver Detalhes
                     </a>

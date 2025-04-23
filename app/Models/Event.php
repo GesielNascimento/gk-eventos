@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Event extends Model
 {
@@ -17,7 +18,7 @@ class Event extends Model
         'event_time',
         'location',
         'banner_path',
-        'category_id', // 👈🏽 novo campo para associação com a categoria
+        'category_id',
     ];
 
     /**
@@ -46,10 +47,17 @@ class Event extends Model
 
     /**
      * Um evento pertence a uma categoria.
-     * Relacionamento para identificar a qual categoria o evento pertence.
      */
     public function category()
     {
         return $this->belongsTo(\App\Models\Category::class);
+    }
+
+    /**
+     * Acessor para verificar se o evento está encerrado (data no passado).
+     */
+    public function getIsFinishedAttribute()
+    {
+        return Carbon::parse($this->event_date)->isPast();
     }
 }
