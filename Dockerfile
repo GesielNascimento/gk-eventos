@@ -1,31 +1,17 @@
-# Imagem oficial do PHP com Apache
-FROM php:8.2-apache
+FROM richarvey/nginx-php-fpm:3.1.6
 
-# Instala dependências do sistema e extensões do PHP necessárias para o Laravel
-RUN apt-get update && apt-get install -y \
-    zip unzip libpq-dev git curl libzip-dev libonig-dev \
-    && docker-php-ext-install pdo pdo_pgsql zip
+COPY . .
 
-# Instala o Composer
-COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
+ENV SKIP_COMPOSER 1
+ENV WEBROOT /var/www/html/public
+ENV PHP_ERRORS_STDERR 1
+ENV RUN_SCRIPTS 1
+ENV REAL_IP_HEADER 1
 
-# Copia os arquivos do projeto para o container
-COPY . /var/www/html
+ENV APP_ENV production
+ENV APP_DEBUG false
+ENV LOG_CHANNEL stderr
 
-# Define o diretório raiz do Apache
-WORKDIR /var/www/html
+ENV COMPOSER_ALLOW_SUPERUSER 1
 
-# Corrige permissões
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Habilita mod_rewrite do Apache
-RUN a2enmod rewrite
-
-# Copia o arquivo de configuração personalizada do Apache
-COPY ./docker/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
-
-# Instala dependências PHP
-RUN composer install --no-dev --optimize-autoloader
-
-# Gera key e migra banco (opcional, melhor deixar em comando separado se quiser controle)
-# RUN php artisan key:generate && php artisan migrate --force
+CMD ["/start.sh"]

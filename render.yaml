@@ -3,11 +3,8 @@ services:
     name: gk-eventos
     env: docker
     plan: free
-    buildCommand: |
-    composer install --no-interaction --prefer-dist --optimize-autoloader
-    php artisan config:clear
-    php artisan config:cache
-    php artisan key:generate
+    buildCommand: "./scripts/00-laravel-deploy.sh"
+    startCommand: "php artisan serve --host=0.0.0.0 --port=10000"
     envVars:
       - key: APP_ENV
         value: production
