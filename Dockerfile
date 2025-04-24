@@ -14,7 +14,9 @@ RUN composer install --no-dev --optimize-autoloader
 
 RUN php artisan key:generate
 
+# Corrige permissões que causam erro 500
+RUN chmod -R 775 storage bootstrap/cache
+
 EXPOSE 10000
 
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=10000"]
-# Força rebuild no Render em 23/04/2025
