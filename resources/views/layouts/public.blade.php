@@ -96,7 +96,7 @@
     </header>
 
     <!-- CARROSSEL -->
-    @hasSection('carousel')
+    @if(View::hasSection('carousel'))
         @yield('carousel')
     @endif
 
